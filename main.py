@@ -1,4 +1,4 @@
-import socket 
+import socket
 
 class HttpMessage:
     def __init__(self, start_line = None, headers = {}, body = None):
@@ -27,9 +27,22 @@ def read_message(message):
     if "Content-Length" in result.headers:
         result.body = message.read(result.headers["Content-Length"])
     
-    elif "Transfer-Encoding" in result.headers 
-        and result.headers["Transfer-Encoding"] == "chunked":
-        # Parse a chunked body
+    elif "Transfer-Encoding" in result.headers and result.headers["Transfer-Encoding"] == "chunked":
+        size_str = message.readline()
+        result.body = ""
+        while size_str and size_str != b"\r\n":
+            chunk_size = 0
+            for char in size_str.decode():
+                if char in "1234567890abcdefABCDEF":
+                    chunk_size *= 16
+                    chunk_size += int(char, 16)
+                else:
+                    break
+
+            result.body += message.read(chunk_size).decode()
+            message.readline()  # Move past newline after chunk
+            size_str = message.readline()
+
 
 
     return result
