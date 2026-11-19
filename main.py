@@ -1,5 +1,6 @@
 from http_client import HttpClient
 from http_parser import build_url_params
+from crawler import Crawler
 import sys
 
 
@@ -35,7 +36,7 @@ if __name__ == "__main__":
             "password": password
         })
         http.send_request("POST", "/accounts/login/", {
-                "Connection": "close",
+                "Connection": "keep-alive",
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "text/html",
                 "Referer": "http://sprinter2.cs.vt.edu/accounts/login/"
@@ -44,7 +45,17 @@ if __name__ == "__main__":
         print(res.start_line)
         for key, value in res.headers.items():
             print(f"{key}:{value}")
-
+        
+        crawler = Crawler(http, "/fakebook/")
+        crawler.crawl()
+            #http.send_request("GET", "/fakebook/", {
+            #    "Connection": "keep-alive",
+            #})
+            #res = http.read_response()
+            #print(res.start_line)
+            #for key, value in res.headers.items():
+            #    print(f"{key}:{value}")
+            #print(res.body.decode())
 
 
 
