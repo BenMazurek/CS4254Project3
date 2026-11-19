@@ -45,18 +45,8 @@ if __name__ == "__main__":
         print(res.start_line)
         for key, value in res.headers.items():
             print(f"{key}:{value}")
-        
+
         crawler = Crawler(http, "/fakebook/")
         crawler.crawl()
-            #http.send_request("GET", "/fakebook/", {
-            #    "Connection": "keep-alive",
-            #})
-            #res = http.read_response()
-            #print(res.start_line)
-            #for key, value in res.headers.items():
-            #    print(f"{key}:{value}")
-            #print(res.body.decode())
-
-
 
 

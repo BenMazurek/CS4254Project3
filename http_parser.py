@@ -78,6 +78,17 @@ def build_request(method, path, headers, body):
 
     return result.encode()
 
+def get_status_code(http_message):
+    status_line = http_message.start_line.strip()
+    status_words = status_line.split()
+    if len(status_words) >= 2 
+        and status_words[0].startswith("HTTP")
+        and status_words[1].isdigit():
+
+        return int(status_words[1])
+    raise ValueError("http message is not a properly formatted response message")
+    
+
 def build_url_params(params):
     return "&".join([f"{name}={value}" for name, value in params.items()])
 

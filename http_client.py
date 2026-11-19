@@ -37,6 +37,7 @@ class HttpClient:
                         self.cookies[name] = value
 
         return result
+    
 
     def _start_connection(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
