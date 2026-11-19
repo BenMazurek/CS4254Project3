@@ -23,7 +23,13 @@ def read_message(message):
     curr_line = message.readline()
     while curr_line and curr_line != b"\r\n":
         field_line, _, field_value = curr_line.decode().partition(":")
-        result.headers[field_line.strip()] = field_value.strip()
+        field_line = field_line.strip()
+        field_value = field_value.strip()
+        if field_line == "Set-Cookie":
+            result.headers.setdefault("Set-Cookie", [])
+            result.headers[field_line].append(field_value)
+        else:
+            result.headers[field_line] = field_value
         curr_line = message.readline()
 
     if not curr_line:
@@ -33,7 +39,7 @@ def read_message(message):
     # Body building
 
     if "Content-Length" in result.headers:
-        result.body = message.read_exact(int(result.headers["Content-Length"]))
+        result.body = read_exact(message, int(result.headers["Content-Length"]))
     
     elif "Transfer-Encoding" in result.headers and result.headers["Transfer-Encoding"] == "chunked":
         body = bytearray()
@@ -71,3 +77,7 @@ def build_request(method, path, headers, body):
     if body: result += body
 
     return result.encode()
+
+def build_url_params(params):
+    return "&".join([f"{name}={value}" for name, value in params.items()])
+
