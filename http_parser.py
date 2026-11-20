@@ -1,3 +1,4 @@
+import gzip
 
 class HttpMessage:
     def __init__(self, start_line = None, headers = None, body = None):
@@ -62,6 +63,9 @@ def read_message(message):
             ending = message.readline()
         result.body = bytes(body)
 
+    # Handle gzip compressed message
+    if "Content-Encoding" in result.headers and result.headers["Content-Encoding"] == "gzip":
+        result.body = gzip.decompress(result.body)
 
     return result
 
@@ -81,10 +85,7 @@ def build_request(method, path, headers, body):
 def get_status_code(http_message):
     status_line = http_message.start_line.strip()
     status_words = status_line.split()
-    if len(status_words) >= 2 
-        and status_words[0].startswith("HTTP")
-        and status_words[1].isdigit():
-
+    if len(status_words) >= 2 and status_words[0].startswith("HTTP") and status_words[1].isdigit():
         return int(status_words[1])
     raise ValueError("http message is not a properly formatted response message")
     
