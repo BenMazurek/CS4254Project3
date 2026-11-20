@@ -17,9 +17,12 @@ class HttpClient:
     def send_request(self, method, path, headers, body = None):
         headers.setdefault("Host", self.host)
         if self.cookies:
-            cookie_str = ";".join([f"{name}={cookie}" for name, cookie in self.cookies.items()])
+            cookie_str = "; ".join([f"{name}={cookie}" for name, cookie in self.cookies.items()])
             headers.setdefault("Cookie", cookie_str)
-        self.sockfile.write(build_request(method, path, headers, body))
+        
+        request = build_request(method, path, headers, body)
+
+        self.sockfile.write(request)
         self.sockfile.flush()
 
     def read_response(self):
