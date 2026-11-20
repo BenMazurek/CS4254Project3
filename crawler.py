@@ -1,3 +1,11 @@
+# Honor pledge:
+
+# As a Hokie, I, Whit Faughnan (PID: whitfaughnan),  will conduct myself with honor and integrity at all times.  
+# I will not lie, cheat, or steal, nor will I accept the actions of those who do.
+
+# As a Hokie, I, Ben Mazurek (PID: benmazurek),  will conduct myself with honor and integrity at all times.  
+# I will not lie, cheat, or steal, nor will I accept the actions of those who do.
+
 from http_client import HttpClient
 from http_parser import get_status_code
 from collections import deque
