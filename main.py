@@ -16,7 +16,8 @@ if __name__ == "__main__":
 
     # Check for correct command line usage
     if len(sys.argv) < 3:
-        print("Usage: python3 main.py <username> <password>")
+        print("Main script usage: python3 main.py <username> <password>")
+        print('Makefile usage: make run ARGS="<username> <password>"')
         sys.exit(1)
     username = sys.argv[1]
     password = sys.argv[2]
