@@ -1,12 +1,16 @@
 import gzip
 
+# A class for storing different parts of an HTTP message. 
+# Optionally, this class can be initialized with a given start line,
+# set of headers, and message body. 
 class HttpMessage:
     def __init__(self, start_line = None, headers = None, body = None):
         self.start_line = start_line
         self.headers = {} if headers is None else headers
         self.body = body
 
-
+# Reads an exact length of characters from a bytestream or string,
+# and converts that character string to a byte array.
 def read_exact(stream, n):
     chunks = bytearray()
     while len(chunks) < n:
@@ -16,6 +20,8 @@ def read_exact(stream, n):
         chunks.extend(part)
     return bytes(chunks)
 
+# Reads an HTTP response, storing the start line, included headers,
+# and message body 
 def read_message(message):
     result = HttpMessage()
     result.start_line = message.readline().decode().strip()
@@ -39,9 +45,11 @@ def read_message(message):
 
     # Body building
 
+    # Handle Content-Length header
     if "Content-Length" in result.headers:
         result.body = read_exact(message, int(result.headers["Content-Length"]))
-    
+
+    # Handle chunked webpages
     elif "Transfer-Encoding" in result.headers and result.headers["Transfer-Encoding"] == "chunked":
         body = bytearray()
         while True:
@@ -63,12 +71,14 @@ def read_message(message):
             ending = message.readline()
         result.body = bytes(body)
 
-    # Handle gzip compressed message
+    # After handling chunked webpage, handle gzip compressed message
     if "Content-Encoding" in result.headers and result.headers["Content-Encoding"] == "gzip":
         result.body = gzip.decompress(result.body)
 
     return result
 
+# Builds an HTTP request with the header items and body if it is given.
+# Returns an encoded byte array of the request to be sent to the web server.
 def build_request(method, path, headers, body):
 
     if body:
@@ -89,7 +99,8 @@ def get_status_code(http_message):
         return int(status_words[1])
     raise ValueError("http message is not a properly formatted response message")
     
-
+# Builds the body of the login request message to be sent when first connecting to Fakebook.
+# Used in main to login and receive the login cookie for use in the crawler.
 def build_url_params(params):
     return "&".join([f"{name}={value}" for name, value in params.items()])
 

@@ -4,17 +4,18 @@ from collections import deque
 import re
 import time
 
-
-#def search(http_client, start_path):
-#    visited = set(start_path)
-#    frontier = set()
-#
-#    while(True):
-
-# Want to rework this
-
+# Web crawler class. Uses a queue of pending links and a 
+# dictionary of previously visited or queued links to visit
+# all possible Fakebook pages linked in other Fakebook pages
+# without revisiting pages it has already scanned.
 class Crawler:
 
+    # Initialization begins by passing the HttpClient
+    # object with an open and logged-in connection to Fakebook.
+    # The start_path link is the first link added to the queue to
+    # be scraped by the webcrawler. Any links it finds on the home
+    # page are added to the queue, and additional webpages contribute
+    # additional queues.
     def __init__(self, http_client, start_path):
         self.http = http_client
         self.visited = {}
@@ -23,15 +24,22 @@ class Crawler:
         self.queue.append(start_path)
         self.visited[start_path] = "queued"
 
+    # The crawling function. This function takes the first link in the
+    # queue to be scanned, requests that page via the HttpClient self.http,
+    # and scrapes the HTML returned by the Fakebook server. If the response
+    # code is not 200 OK, other response codes are handled here. 
+    # If the crawler finds more links to be scraped, it adds them to its queue,
+    # and the next call to crawlNext will scan the first page up next in the queue.
     def crawlNext(self):
 
+        # Get the first link in queue
         path = self.queue.popleft()
 
+        # Mark in the dictionary that this link has been visited
         self.visited[path] = "visited"
 
-        # Request given path from fakebook
-        # for cookie in self.http.cookies:
-
+        # Request page at the link from fakebook
+        # This request allows gzip-encoded webpages to be returned by the server
         self.http.send_request("GET", path, {
             "Connection": "keep-alive",
             "Accept": "text/html",
@@ -44,7 +52,6 @@ class Crawler:
         # Get status code and determine action
         status_code = get_status_code(response)
 
-        #breakpoint()
         match status_code:
             case 301 | 302: # Permanently moved
                 if location := response.headers.get("Location"):
@@ -64,11 +71,17 @@ class Crawler:
                 self.queue.append(path)
                 return
             case 200: # OK
+
+                # Decode the response body and scrape it for a secret flag
                 body = response.body.decode()
                 match = re.search(r'class="secret_flag" style="color:red">FLAG: (.{64})<\/h2>', body)
+
+                # If a secret flag is found, add the match object to our dictionary of found flags
                 if match:
                     self.found_flags[path] = match
 
+                # If any links are found, add them to the queue if they are not
+                # already visited or queued to be visited
                 links = re.findall(r'\/fakebook\/[a-zA-Z0-9\/\-]+\/', body)
                 for link in links:
                     if link not in self.visited:
@@ -76,18 +89,6 @@ class Crawler:
                         self.queue.append(link)
 
                 return
-
-def find_links(body):
-    matches = re.findall(r"\/fakebook\/\d+\/", body)
-    for match in matches:
-        print(match)
-
-def handle_redirect(response):
-    if location := response.headers.get("Location"):
-        path = location.strip().removeprefix("http://sprinter2.cs.vt.edu")
-        crawl(path)
-
-# def retry_request()
 
 
 
