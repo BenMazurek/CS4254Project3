@@ -18,11 +18,6 @@ if __name__ == "__main__":
             "Connection": "keep-alive"
         })
         res = http.read_response()
-        print(res.start_line)
-        for key, value in res.headers.items():
-            print(f"{key}:{value}")
-
-        print("\n END MESSAGE ONE \n")
 
         search_string = 'csrfmiddlewaretoken" value="'
         body = res.body.decode()
@@ -42,9 +37,6 @@ if __name__ == "__main__":
                 "Referer": "http://sprinter2.cs.vt.edu/accounts/login/"
         }, body=urlparams)
         res = http.read_response()
-        print(res.start_line)
-        for key, value in res.headers.items():
-            print(f"{key}:{value}")
 
         crawler = Crawler(http, "/fakebook/")
 
