@@ -47,6 +47,14 @@ if __name__ == "__main__":
             print(f"{key}:{value}")
 
         crawler = Crawler(http, "/fakebook/")
-        crawler.crawl()
+
+        # breakpoint()
+        while len(crawler.queue) != 0 and len(crawler.found_flags) < 5:
+            crawler.crawlNext()
+            # print("Links in queue: " + str(len(crawler.queue)))
+
+        # Once the tokens are found, print them to the console.
+        for path in crawler.found_flags:
+            print(crawler.found_flags[path].group()[44:108])
 
 
